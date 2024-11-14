@@ -3,140 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spin Wheel Example</title>
+    <title>Get Data from URL and Display</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            padding: 20px;
             text-align: center;
-            padding: 50px;
         }
-
-        #spin-wheel {
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: conic-gradient(#ff9b00 0deg 90deg, #00c8ff 90deg 180deg, #ff4b8d 180deg 270deg, #56ff5d 270deg 360deg);
-            position: relative;
-            margin: 50px auto;
-            transition: transform 5s ease-out;
+        #data-container {
+            margin-top: 30px;
+            font-size: 18px;
+            list-style-type: none;
+            padding: 0;
         }
-
-        .spin-btn {
-            display: block;
-            width: 100px;
-            height: 40px;
-            background-color: #ff9b00;
-            color: white;
-            border: none;
-            margin: 20px auto;
-            cursor: pointer;
-            font-size: 16px;
+        #data-container li {
+            background-color: #f0f0f0;
+            margin: 5px 0;
+            padding: 10px;
             border-radius: 5px;
         }
-
-        .wheel-segment {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform-origin: 0 100%;
-            width: 50%;
-            height: 50%;
-            background: #ff9b00;
-        }
-
-        #result {
-            font-size: 24px;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-
     </style>
 </head>
 <body>
 
-    <div id="spin-wheel"></div>
-    <button class="spin-btn" onclick="spinWheel()">Spin</button>
-    <div id="result"></div>
+    <h1>Danh sách từ API</h1>
+    <ul id="data-container"></ul>
 
     <script>
-        let segments = [];
-        let spinInProgress = false;
-
-        // Fetch data from the URL
+        // Hàm lấy dữ liệu từ API
         async function fetchData() {
-            const response = await fetch('https://script.googleusercontent.com/macros/echo?user_content_key=j0s5NU-q_B7Y1MVQ5mqA3Wb4ijKkI7tRbQJhF4b8fL79X4uLJzKzx3PPk2IRh0XWw563rDJOCjobkVOCsSuXWcDeY2HbxFijm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnONG3ViBiI9nC9bkp7jifxrCDT_R2hvRCjFgmzwlGCCDpn0_LJQdioEkPtWBJaj8LnI2QiCIinZFUyKsE-dy1bteJpI5okNM4w&lib=MkUXxWkrVcNCZQT_j1DjnedFEEXvh02xv');
-            const data = await response.json();
+            try {
+                // Gửi yêu cầu GET đến URL API
+                const response = await fetch('https://script.googleusercontent.com/macros/echo?user_content_key=...');
+                // Kiểm tra nếu có lỗi xảy ra
+                if (!response.ok) {
+                    throw new Error('Có lỗi xảy ra khi lấy dữ liệu');
+                }
+                
+                // Chuyển đổi dữ liệu JSON từ phản hồi
+                const data = await response.json();
 
-            if (data && data.length) {
-                segments = data;
-                createWheel(segments);
-            } else {
-                console.log("No data received or data is empty.");
+                // Kiểm tra dữ liệu nhận được
+                if (data && data.data && Array.isArray(data.data)) {
+                    displayData(data.data);
+                } else {
+                    console.error('Dữ liệu không hợp lệ hoặc trống');
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu từ API:', error);
             }
         }
 
-        // Create wheel segments based on data
-        function createWheel(segments) {
-            const wheel = document.getElementById('spin-wheel');
-            wheel.innerHTML = ''; // Clear existing segments
+        // Hàm hiển thị dữ liệu lên giao diện
+        function displayData(data) {
+            const dataContainer = document.getElementById('data-container');
+            // Xóa nội dung cũ nếu có
+            dataContainer.innerHTML = '';
 
-            const numberOfSegments = segments.length;
-            const segmentAngle = 360 / numberOfSegments;
-
-            for (let i = 0; i < numberOfSegments; i++) {
-                const segment = document.createElement('div');
-                segment.classList.add('wheel-segment');
-                segment.style.transform = `rotate(${i * segmentAngle}deg)`;
-                segment.style.background = getRandomColor();
-
-                // Add the segment label
-                const label = document.createElement('span');
-                label.innerText = segments[i];
-                label.style.position = 'absolute';
-                label.style.transform = 'translateX(-50%)';
-                label.style.bottom = '20px';  // Adjust as needed
-                segment.appendChild(label);
-
-                wheel.appendChild(segment);
-            }
+            // Duyệt qua dữ liệu và tạo các phần tử <li> để hiển thị
+            data.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;  // Hiển thị giá trị mỗi phần tử trong danh sách
+                dataContainer.appendChild(li);
+            });
         }
 
-        // Function to spin the wheel
-        function spinWheel() {
-            if (spinInProgress) return; // Prevent multiple spins at the same time
-            spinInProgress = true;
-            
-            const wheel = document.getElementById('spin-wheel');
-            const randomDegree = Math.floor(Math.random() * 360) + 3600; // Random number + multiple spins
-            wheel.style.transition = 'transform 5s ease-out';
-            wheel.style.transform = `rotate(${randomDegree}deg)`;
-
-            // Calculate the result after the spin ends
-            setTimeout(() => {
-                const totalRotation = randomDegree % 360; // Final rotation within 360 degrees
-                const segmentIndex = Math.floor((360 - totalRotation) / (360 / segments.length));
-                displayResult(segments[segmentIndex]);
-                spinInProgress = false;
-            }, 5000); // Wait for the spin duration to end
-        }
-
-        // Function to display the result on screen
-        function displayResult(result) {
-            const resultElement = document.getElementById('result');
-            resultElement.innerHTML = `Kết quả: ${result}`;
-        }
-
-        // Function to generate a random color for each segment
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
-        }
-
-        // Fetch data when the page loads
+        // Gọi hàm để lấy và hiển thị dữ liệu khi trang được tải
         window.onload = fetchData;
     </script>
 
