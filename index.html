@@ -33,44 +33,29 @@
         // Hàm lấy dữ liệu từ API
         async function fetchData() {
             try {
-                // URL API bạn cung cấp
+                // URL API của bạn
                 const url = 'https://script.googleusercontent.com/macros/echo?user_content_key=j0s5NU-q_B7Y1MVQ5mqA3Wb4ijKkI7tRbQJhF4b8fL79X4uLJzKzx3PPk2IRh0XWw563rDJOCjobkVOCsSuXWcDeY2HbxFijm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnONG3ViBiI9nC9bkp7jifxrCDT_R2hvRCjFgmzwlGCCDpn0_LJQdioEkPtWBJaj8LnI2QiCIinZFUyKsE-dy1bteJpI5okNM4w&lib=MkUXxWkrVcNCZQT_j1DjnedFEEXvh02xv';
+                
+                // Gửi yêu cầu GET với chế độ no-cors
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'no-cors'  // Chế độ không kiểm tra CORS
+                });
 
-                // Gửi yêu cầu GET đến URL API
-                const response = await fetch(url);
+                // Không thể đọc dữ liệu từ phản hồi nếu sử dụng chế độ no-cors
+                console.log(response); // Thực tế, bạn sẽ không thể đọc được dữ liệu JSON từ đây
 
-                // Kiểm tra nếu có lỗi xảy ra trong quá trình lấy dữ liệu
                 if (!response.ok) {
                     throw new Error('Có lỗi khi lấy dữ liệu từ API');
                 }
 
-                // Chuyển đổi dữ liệu JSON từ phản hồi
-                const data = await response.json();
+                // Bạn không thể xử lý dữ liệu ở đây vì chế độ no-cors
+                // Dữ liệu không thể truy cập từ response trong chế độ no-cors
 
-                // Kiểm tra dữ liệu nhận được
-                if (data && data.data && Array.isArray(data.data)) {
-                    displayData(data.data); // Hiển thị dữ liệu nếu hợp lệ
-                } else {
-                    console.error('Dữ liệu không hợp lệ hoặc trống');
-                }
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu từ API:', error);
-                // Hiển thị thông báo lỗi nếu có
                 document.getElementById('data-container').innerHTML = '<li>Lỗi khi lấy dữ liệu từ API</li>';
             }
-        }
-
-        // Hàm hiển thị dữ liệu lên giao diện
-        function displayData(data) {
-            const dataContainer = document.getElementById('data-container');
-            dataContainer.innerHTML = ''; // Xóa nội dung cũ nếu có
-
-            // Duyệt qua mảng dữ liệu và tạo các phần tử <li> để hiển thị
-            data.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item; // Hiển thị từng phần tử của mảng
-                dataContainer.appendChild(li);
-            });
         }
 
         // Gọi hàm để lấy và hiển thị dữ liệu khi trang được tải
