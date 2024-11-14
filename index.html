@@ -15,6 +15,10 @@
             margin: 0;
         }
 
+        .wheel-container {
+            text-align: center;
+        }
+
         .wheel {
             width: 300px;
             height: 300px;
@@ -62,6 +66,13 @@
             background-color: #0056b3;
         }
 
+        .result {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -77,12 +88,13 @@
     </style>
 </head>
 <body>
-    <div>
+    <div class="wheel-container">
         <div class="wheel" id="wheel">
             <div class="pointer"></div>
             <!-- Các số sẽ được thêm vào đây sau khi load dữ liệu từ Google Sheets -->
         </div>
         <button class="btn-spin" onclick="spinWheel()">Quay Số</button>
+        <div id="result" class="result"></div> <!-- Kết quả sẽ hiển thị ở đây -->
     </div>
 
     <script>
@@ -107,6 +119,9 @@
             const wheel = document.getElementById('wheel');
             const anglePerItem = 360 / data.length;
 
+            // Xóa nội dung vòng quay trước khi thêm dữ liệu mới
+            wheel.innerHTML = '<div class="pointer"></div>';
+
             // Dùng vòng lặp để thêm các phần tử vào vòng quay
             data.forEach((item, index) => {
                 const numberDiv = document.createElement('div');
@@ -120,9 +135,18 @@
         // Hàm quay vòng quay
         function spinWheel() {
             const wheel = document.getElementById('wheel');
+            const resultDisplay = document.getElementById('result');
+            
+            // Thêm animation quay cho vòng quay
             wheel.classList.add('spin-active');
+            resultDisplay.innerHTML = ''; // Xóa kết quả cũ trước khi quay mới
+
+            // Sau khi quay xong, tính toán kết quả và hiển thị
             setTimeout(() => {
                 wheel.classList.remove('spin-active');
+                const randomIndex = Math.floor(Math.random() * data.length);
+                const result = data[randomIndex]; // Chọn ngẫu nhiên một giá trị từ dữ liệu
+                resultDisplay.innerHTML = `Kết quả: ${result}`; // Hiển thị kết quả
             }, 5000); // Quay vòng quay trong 5 giây
         }
 
