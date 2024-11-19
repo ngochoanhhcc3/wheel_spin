@@ -3,63 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lấy Dữ Liệu Từ API</title>
+    <title>Fetch Data from API</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
-            text-align: center;
+            margin: 20px;
         }
-        #data-container {
-            margin-top: 30px;
-            font-size: 18px;
-            list-style-type: none;
-            padding: 0;
+        .data-container {
+            margin-top: 20px;
         }
-        #data-container li {
-            background-color: #f0f0f0;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
+        .item {
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Danh sách dữ liệu từ API</h1>
-    <ul id="data-container"></ul>
+    <h1>Data from Google Script API</h1>
+    <button id="fetchDataButton">Get Data</button>
+    
+    <div class="data-container" id="dataContainer">
+        <!-- Data will be displayed here -->
+    </div>
 
     <script>
-        // Hàm lấy dữ liệu từ API
+        // Function to fetch data from API and display it
         async function fetchData() {
+            const apiUrl = 'https://script.google.com/macros/s/AKfycbzejni5O-dlo6_-xHIRU8-VxZiRWPiWwl_B3_0Md7yjKLpbMlnYqcfre16QS4Xyrf8a/exec';
+
             try {
-                // URL API của bạn
-                const url = 'https://script.googleusercontent.com/macros/echo?user_content_key=j0s5NU-q_B7Y1MVQ5mqA3Wb4ijKkI7tRbQJhF4b8fL79X4uLJzKzx3PPk2IRh0XWw563rDJOCjobkVOCsSuXWcDeY2HbxFijm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnONG3ViBiI9nC9bkp7jifxrCDT_R2hvRCjFgmzwlGCCDpn0_LJQdioEkPtWBJaj8LnI2QiCIinZFUyKsE-dy1bteJpI5okNM4w&lib=MkUXxWkrVcNCZQT_j1DjnedFEEXvh02xv';
-                
-                // Gửi yêu cầu GET với chế độ no-cors
-                const response = await fetch(url, {
-                    method: 'GET',
-                    mode: 'no-cors'  // Chế độ không kiểm tra CORS
-                });
+                // Fetch data from the API
+                const response = await fetch(apiUrl);
 
-                // Không thể đọc dữ liệu từ phản hồi nếu sử dụng chế độ no-cors
-                console.log(response); // Thực tế, bạn sẽ không thể đọc được dữ liệu JSON từ đây
-
+                // Check if the response is successful
                 if (!response.ok) {
-                    throw new Error('Có lỗi khi lấy dữ liệu từ API');
+                    throw new Error('Network response was not ok ' + response.statusText);
                 }
 
-                // Bạn không thể xử lý dữ liệu ở đây vì chế độ no-cors
-                // Dữ liệu không thể truy cập từ response trong chế độ no-cors
+                // Parse the JSON data
+                const data = await response.json();
 
+                // Get the container to display the data
+                const dataContainer = document.getElementById('dataContainer');
+                dataContainer.innerHTML = ''; // Clear previous data
+
+                // Check if data exists and display it
+                if (data && Array.isArray(data)) {
+                    data.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.classList.add('item');
+                        itemDiv.textContent = JSON.stringify(item, null, 2); // Pretty-print each item
+                        dataContainer.appendChild(itemDiv);
+                    });
+                } else {
+                    dataContainer.innerHTML = '<p>No data found</p>';
+                }
             } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu từ API:', error);
-                document.getElementById('data-container').innerHTML = '<li>Lỗi khi lấy dữ liệu từ API</li>';
+                console.error('There was an error fetching the data:', error);
+                const dataContainer = document.getElementById('dataContainer');
+                dataContainer.innerHTML = '<p>Error loading data</p>';
             }
         }
 
-        // Gọi hàm để lấy và hiển thị dữ liệu khi trang được tải
-        window.onload = fetchData;
+        // Add event listener to the button to fetch data when clicked
+        document.getElementById('fetchDataButton').addEventListener('click', fetchData);
     </script>
 
 </body>
