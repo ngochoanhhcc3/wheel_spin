@@ -112,81 +112,32 @@
   </div>
 
   <script>
-    const sheetID = '1a0d6__ySC3ng8yBiKUon7LxNnnoDnAw2W6-9FXIgFPM'; // ID của Google Sheet
-    const apiKey = 'AIzaSyCVEhUO5xJCdzWHC4wia3Ouk9wNqqMKEaM'; // API Key của bạn
-    const range = 'Ăn'; // Tên sheet trong Google Sheets (bạn có thể thay đổi nếu cần)
+    // Đảm bảo rằng tất cả mã JavaScript đều được thực thi sau khi DOM đã sẵn sàng
+    document.addEventListener("DOMContentLoaded", function () {
+      const sheetID = '1a0d6__ySC3ng8yBiKUon7LxNnnoDnAw2W6-9FXIgFPM'; // ID của Google Sheet
+      const apiKey = 'AIzaSyCVEhUO5xJCdzWHC4wia3Ouk9wNqqMKEaM'; // API Key của bạn
+      const range = 'Ăn'; // Tên sheet trong Google Sheets (bạn có thể thay đổi nếu cần)
 
-    // URL để lấy dữ liệu từ Google Sheets
-    const apiURL = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
+      // URL để lấy dữ liệu từ Google Sheets
+      const apiURL = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
 
-    // Lấy dữ liệu từ Google Sheets API
-    fetch(apiURL)
-      .then(response => response.json())
-      .then(data => {
-        const rows = data.values;
-        const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-        
-        // Dữ liệu từ cột B (row[1]) sẽ được thêm vào bảng
-        const values = rows.filter((row, index) => index > 0 && row[1] && row[1].trim() !== '').map(row => row[1]);
-
-        // Xử lý nếu không có dữ liệu
-        if (values.length === 0) {
-          alert('No valid data in Column B.');
-          return;
-        }
-
-        // Thêm dữ liệu vào bảng mà không có màu sắc
-        values.forEach(value => {
-          const row = document.createElement('tr');
-          const cell = document.createElement('td');
-          cell.textContent = value;
-          row.appendChild(cell);
-          tableBody.appendChild(row);
-        });
-
-        // Cài đặt nút quay số
-        document.getElementById('start-button').addEventListener('click', startSpin);
-
-        let spinning = false;
-
-        function startSpin() {
-          if (spinning) return; // Tránh quay khi đang quay
-
-          spinning = true;
-          
-          // Chọn ngẫu nhiên một dòng từ bảng
-          const randomIndex = Math.floor(Math.random() * values.length);
-          const result = values[randomIndex];
-          
-          // Hiển thị kết quả trong popup
-          showPopup(result);
-
-          // Xóa lựa chọn đã quay
-          values.splice(randomIndex, 1);
-          updateTable();
-
-          spinning = false;
-        }
-
-        // Hiển thị kết quả trong popup
-        function showPopup(result) {
-          document.getElementById('popup-result').textContent = `Result: ${result}`;
-          document.getElementById('popup').style.display = 'block';
-        }
-
-        // Đóng popup và cho phép quay lại
-        function closePopup() {
-          document.getElementById('popup').style.display = 'none';
-          // Cho phép quay lại khi đóng popup
-          document.getElementById('start-button').disabled = false;
-        }
-
-        // Cập nhật bảng sau khi xóa mục
-        function updateTable() {
+      // Lấy dữ liệu từ Google Sheets API
+      fetch(apiURL)
+        .then(response => response.json())
+        .then(data => {
+          const rows = data.values;
           const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-          tableBody.innerHTML = ''; // Xóa bảng hiện tại
+          
+          // Dữ liệu từ cột B (row[1]) sẽ được thêm vào bảng
+          const values = rows.filter((row, index) => index > 0 && row[1] && row[1].trim() !== '').map(row => row[1]);
 
-          // Thêm lại các mục còn lại trong bảng
+          // Xử lý nếu không có dữ liệu
+          if (values.length === 0) {
+            alert('No valid data in Column B.');
+            return;
+          }
+
+          // Thêm dữ liệu vào bảng
           values.forEach(value => {
             const row = document.createElement('tr');
             const cell = document.createElement('td');
@@ -194,11 +145,63 @@
             row.appendChild(cell);
             tableBody.appendChild(row);
           });
-        }
 
-      })
-      .catch(error => console.error('Error fetching data: ', error));
+          // Cài đặt nút quay số
+          document.getElementById('start-button').addEventListener('click', startSpin);
 
+          let spinning = false;
+
+          function startSpin() {
+            if (spinning) return; // Tránh quay khi đang quay
+
+            spinning = true;
+            
+            // Chọn ngẫu nhiên một dòng từ bảng
+            const randomIndex = Math.floor(Math.random() * values.length);
+            const result = values[randomIndex];
+            
+            // Hiển thị kết quả trong popup
+            showPopup(result);
+
+            // Xóa lựa chọn đã quay
+            values.splice(randomIndex, 1);
+            updateTable();
+
+            spinning = false;
+          }
+
+          // Hiển thị kết quả trong popup
+          function showPopup(result) {
+            document.getElementById('popup-result').textContent = `Result: ${result}`;
+            document.getElementById('popup').style.display = 'block';
+          }
+
+          // Đóng popup và cho phép quay lại
+          function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            // Cho phép quay lại khi đóng popup
+            document.getElementById('start-button').disabled = false;
+          }
+
+          // Cập nhật bảng sau khi xóa mục
+          function updateTable() {
+            const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Xóa bảng hiện tại
+
+            // Thêm lại các mục còn lại trong bảng
+            values.forEach(value => {
+              const row = document.createElement('tr');
+              const cell = document.createElement('td');
+              cell.textContent = value;
+              row.appendChild(cell);
+              tableBody.appendChild(row);
+            });
+          }
+
+        })
+        .catch(error => console.error('Error fetching data: ', error));
+
+    });
   </script>
 
 </body>
