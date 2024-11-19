@@ -29,11 +29,14 @@
     <script>
         // Function to fetch data from API and display it
         async function fetchData() {
-            const apiUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=Lt6lNcKdki1p6Zp5yfHYoaWGAjVWJ63H1DNS9lOBmb-RA6xDgf9t_gTlrhi9ztGJ2I8pu3UmaJY0ZGKuJ32OAix9pNEd7CKam5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnEweBETjycb-ftvrbw2fMxw_pBDK4qb6jddh1SixXoBGo8SlfX7_bC-g2pJoUntvFUjeS7u1tlCZe8HI_dHmPzRqq3hUaA1_-Q&lib=MkUXxWkrVcNCZQT_j1DjnedFEEXvh02xv';
+            const apiUrl = 'https://script.google.com/macros/s/AKfycbwrl1jXv_yvEsoTef-7As4b91f1hYGKR4bhfKdqaMzwULCUHcVkNwbPW-0O3Ugu9vM-/exec';
 
             try {
                 // Fetch data from the API
-                const response = await fetch(apiUrl);
+                const response = await fetch(apiUrl, {
+                                              method: 'GET',
+                                              mode: 'no-cors'
+                                            });
 
                 // Check if the response is successful
                 if (!response.ok) {
