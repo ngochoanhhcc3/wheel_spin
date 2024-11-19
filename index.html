@@ -3,13 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Get Data from Google Sheets</title>
+  <title>Wheel Spin from Google Sheets Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+    .wheel-container {
+      width: 400px;
+      height: 400px;
+      margin: 0 auto;
+      border-radius: 50%;
+      border: 5px solid #333;
+      position: relative;
+      background-color: #fff;
+    }
+    .wheel-item {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      background-color: #ffcc00;
+      color: white;
+      font-weight: bold;
+      line-height: 50px;
+      text-align: center;
+      border-radius: 50%;
+      transform-origin: 100% 100%;
+    }
+    #start-button {
+      padding: 15px 30px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #start-button:hover {
+      background-color: #45a049;
+    }
+    #popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      background-color: #fff;
+      border: 1px solid #333;
+      border-radius: 5px;
+      box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+    }
+    #popup h2 {
+      margin: 0;
+    }
+    #popup button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #popup button:hover {
+      background-color: #d32f2f;
+    }
+  </style>
 </head>
 <body>
-  <table id="data-table" border="1">
-    <tr>
-    </tr>
-  </table>
+
+  <h1>Wheel Spin from Google Sheets - Column B</h1>
+  
+  <div class="wheel-container" id="wheel-container">
+    <!-- Wheel items will be inserted here -->
+  </div>
+  
+  <button id="start-button">Start Spin</button>
+
+  <div id="popup">
+    <h2 id="popup-result">Result: </h2>
+    <button onclick="closePopup()">Close</button>
+  </div>
 
   <script>
     const sheetID = '1a0d6__ySC3ng8yBiKUon7LxNnnoDnAw2W6-9FXIgFPM'; // ID của Google Sheet
@@ -19,28 +98,78 @@
     // URL để lấy dữ liệu từ Google Sheets
     const apiURL = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
 
-    // Fetch dữ liệu từ Google Sheets API
+    // Lấy dữ liệu từ Google Sheets API
     fetch(apiURL)
       .then(response => response.json())
       .then(data => {
-        const rows = data.values; // Dữ liệu trả về là một mảng 2 chiều
-        const table = document.getElementById('data-table');
+        const rows = data.values;
+        const wheelItems = document.getElementById('wheel-container');
+        
+        // Dữ liệu từ cột B (row[1]) sẽ được thêm vào wheel
+        const values = rows.filter((row, index) => index > 0 && row[1] && row[1].trim() !== '').map(row => row[1]);
 
-        // Lặp qua từng hàng trong dữ liệu và tạo các hàng trong bảng HTML
-        rows.forEach((row, index) => {
-          if (index === 0) return; // Bỏ qua hàng đầu tiên nếu là tiêu đề
+        // Xử lý nếu không có dữ liệu
+        if (values.length === 0) {
+          alert('No valid data in Column B.');
+          return;
+        }
 
-          const columnBValue = row[1]; // Chỉ lấy giá trị ở cột B (index 1)
-
-          // Kiểm tra nếu ô trong cột B có giá trị (không phải chuỗi rỗng hoặc null)
-          if (columnBValue && columnBValue.trim() !== '') {
-            const tr = document.createElement('tr');
-            const td = document.createElement('td');
-            td.textContent = columnBValue; // Gán giá trị cột B vào ô bảng
-            tr.appendChild(td);
-            table.appendChild(tr);
-          }
+        // Tạo các mục trên vòng quay từ dữ liệu
+        const angleStep = 360 / values.length;
+        values.forEach((value, index) => {
+          const wheelItem = document.createElement('div');
+          wheelItem.className = 'wheel-item';
+          wheelItem.style.transform = `rotate(${angleStep * index}deg)`;
+          wheelItem.style.backgroundColor = getRandomColor(); // Màu sắc ngẫu nhiên
+          wheelItem.textContent = value;
+          wheelItems.appendChild(wheelItem);
         });
+
+        // Cài đặt nút quay vòng
+        document.getElementById('start-button').addEventListener('click', startSpin);
+
+        let spinning = false;
+
+        function startSpin() {
+          if (spinning) return; // Tránh quay khi đang quay
+
+          spinning = true;
+          const wheel = document.getElementById('wheel-container');
+          const randomDeg = Math.floor(Math.random() * 360 + 3600); // Quay 10 vòng ngẫu nhiên
+
+          // Quay vòng
+          wheel.style.transition = 'transform 4s ease-out';
+          wheel.style.transform = `rotate(${randomDeg}deg)`;
+
+          // Khi quay xong, hiển thị kết quả
+          setTimeout(() => {
+            const resultIndex = Math.floor((randomDeg % 360) / angleStep);
+            showPopup(values[resultIndex]);
+            spinning = false;
+          }, 4000);
+        }
+
+        // Hiển thị kết quả trong popup
+        function showPopup(result) {
+          document.getElementById('popup-result').textContent = `Result: ${result}`;
+          document.getElementById('popup').style.display = 'block';
+        }
+
+        // Đóng popup
+        function closePopup() {
+          document.getElementById('popup').style.display = 'none';
+        }
+
+        // Hàm tạo màu ngẫu nhiên
+        function getRandomColor() {
+          const letters = '0123456789ABCDEF';
+          let color = '#';
+          for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+          }
+          return color;
+        }
+
       })
       .catch(error => console.error('Error fetching data: ', error));
   </script>
