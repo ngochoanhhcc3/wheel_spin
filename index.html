@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spin Wheel - Google Sheets Data</title>
+  <title>Spin Table - Google Sheets Data</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,27 +13,23 @@
       background-color: #f0f0f0;
     }
 
-    .wheel-container {
-      width: 400px;
-      height: 400px;
-      margin: 50px auto;
-      border-radius: 50%;
-      border: 5px solid #333;
-      position: relative;
-      background-color: #fff;
-      overflow: hidden;
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
     }
 
-    .wheel-item {
-      position: absolute;
-      width: 100%;
-      height: 50%;
+    th, td {
+      padding: 10px;
       text-align: center;
-      line-height: 90px;
-      font-weight: bold;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #4CAF50;
       color: white;
-      transform-origin: 50% 100%;
-      font-size: 18px;
     }
 
     #start-button {
@@ -86,13 +82,20 @@
 </head>
 <body>
 
-  <h1>Wheel Spin from Google Sheets - Column B</h1>
+  <h1>Spin Table from Google Sheets - Column B</h1>
   
-  <div class="wheel-container" id="wheel-container">
-    <!-- Các mục sẽ được thêm vào đây -->
-  </div>
+  <table id="data-table">
+    <thead>
+      <tr>
+        <th>Column B</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dữ liệu sẽ được thêm vào đây -->
+    </tbody>
+  </table>
   
-  <button id="start-button">Start Spin</button>
+  <button id="start-button">Spin</button>
 
   <div id="popup">
     <h2 id="popup-result">Result: </h2>
@@ -112,9 +115,9 @@
       .then(response => response.json())
       .then(data => {
         const rows = data.values;
-        const wheelItems = document.getElementById('wheel-container');
+        const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
         
-        // Dữ liệu từ cột B (row[1]) sẽ được thêm vào wheel
+        // Dữ liệu từ cột B (row[1]) sẽ được thêm vào bảng
         const values = rows.filter((row, index) => index > 0 && row[1] && row[1].trim() !== '').map(row => row[1]);
 
         // Xử lý nếu không có dữ liệu
@@ -123,18 +126,16 @@
           return;
         }
 
-        // Tạo các mục trên vòng quay từ dữ liệu
-        const angleStep = 360 / values.length;
-        values.forEach((value, index) => {
-          const wheelItem = document.createElement('div');
-          wheelItem.className = 'wheel-item';
-          wheelItem.style.transform = `rotate(${angleStep * index}deg)`;
-          wheelItem.style.backgroundColor = getRandomColor(); // Màu sắc ngẫu nhiên
-          wheelItem.textContent = value;
-          wheelItems.appendChild(wheelItem);
+        // Thêm dữ liệu vào bảng
+        values.forEach(value => {
+          const row = document.createElement('tr');
+          const cell = document.createElement('td');
+          cell.textContent = value;
+          row.appendChild(cell);
+          tableBody.appendChild(row);
         });
 
-        // Cài đặt nút quay vòng
+        // Cài đặt nút quay số
         document.getElementById('start-button').addEventListener('click', startSpin);
 
         let spinning = false;
@@ -143,19 +144,15 @@
           if (spinning) return; // Tránh quay khi đang quay
 
           spinning = true;
-          const wheel = document.getElementById('wheel-container');
-          const randomDeg = Math.floor(Math.random() * 360 + 3600); // Quay 10 vòng ngẫu nhiên
-
-          // Quay vòng
-          wheel.style.transition = 'transform 4s ease-out';
-          wheel.style.transform = `rotate(${randomDeg}deg)`;
-
-          // Khi quay xong, hiển thị kết quả
-          setTimeout(() => {
-            const resultIndex = Math.floor((randomDeg % 360) / angleStep);
-            showPopup(values[resultIndex]);
-            spinning = false;
-          }, 4000);
+          
+          // Chọn ngẫu nhiên một dòng từ bảng
+          const randomIndex = Math.floor(Math.random() * values.length);
+          const result = values[randomIndex];
+          
+          // Hiển thị kết quả trong popup
+          showPopup(result);
+          
+          spinning = false;
         }
 
         // Hiển thị kết quả trong popup
@@ -167,16 +164,6 @@
         // Đóng popup
         function closePopup() {
           document.getElementById('popup').style.display = 'none';
-        }
-
-        // Hàm tạo màu ngẫu nhiên
-        function getRandomColor() {
-          const letters = '0123456789ABCDEF';
-          let color = '#';
-          for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-          }
-          return color;
         }
 
       })
