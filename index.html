@@ -46,6 +46,8 @@
       padding: 10px;
       text-align: center;
       border: 1px solid #ddd;
+      border-radius: 5px;
+      margin: 5px;
     }
 
     th {
@@ -102,7 +104,7 @@
     </tbody>
   </table>
   
-  <button id="start-button">Spin</button>
+  <button id="start-button">Quay số</button>
 
   <div id="popup">
     <h2 id="popup-result">Result: </h2>
@@ -133,12 +135,11 @@
           return;
         }
 
-        // Thêm dữ liệu vào bảng và gán màu ngẫu nhiên cho mỗi dòng
+        // Thêm dữ liệu vào bảng mà không có màu sắc
         values.forEach(value => {
           const row = document.createElement('tr');
           const cell = document.createElement('td');
           cell.textContent = value;
-          row.style.backgroundColor = getRandomColor(); // Thêm màu ngẫu nhiên cho mỗi dòng
           row.appendChild(cell);
           tableBody.appendChild(row);
         });
@@ -159,7 +160,11 @@
           
           // Hiển thị kết quả trong popup
           showPopup(result);
-          
+
+          // Xóa lựa chọn đã quay
+          values.splice(randomIndex, 1);
+          updateTable();
+
           spinning = false;
         }
 
@@ -174,18 +179,24 @@
           document.getElementById('popup').style.display = 'none';
         }
 
+        // Cập nhật bảng sau khi xóa mục
+        function updateTable() {
+          const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+          tableBody.innerHTML = ''; // Xóa bảng hiện tại
+
+          // Thêm lại các mục còn lại trong bảng
+          values.forEach(value => {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.textContent = value;
+            row.appendChild(cell);
+            tableBody.appendChild(row);
+          });
+        }
+
       })
       .catch(error => console.error('Error fetching data: ', error));
 
-    // Hàm tạo màu ngẫu nhiên cho mỗi dòng
-    function getRandomColor() {
-      const letters = '0123456789ABCDEF';
-      let color = '#';
-      for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-    }
   </script>
 
 </body>
