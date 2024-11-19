@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wheel Spin from Google Sheets Data</title>
+  <title>Spin Wheel from Google Sheets Data</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,13 +13,14 @@
       background-color: #f0f0f0;
     }
     .wheel-container {
-      width: 400px;
-      height: 400px;
+      width: 300px;
+      height: 300px;
       margin: 0 auto;
       border-radius: 50%;
       border: 5px solid #333;
       position: relative;
       background-color: #fff;
+      overflow: hidden;
     }
     .wheel-item {
       position: absolute;
@@ -77,10 +78,10 @@
 </head>
 <body>
 
-  <h1>Wheel Spin from Google Sheets - Column B</h1>
+  <h1>Spin Wheel from Google Sheets - Column B</h1>
   
   <div class="wheel-container" id="wheel-container">
-    <!-- Wheel items will be inserted here -->
+    <!-- Các mục của vòng quay sẽ được thêm vào đây -->
   </div>
   
   <button id="start-button">Start Spin</button>
