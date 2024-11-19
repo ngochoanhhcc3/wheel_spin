@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spin Wheel from Google Sheets Data</title>
+  <title>Spin Wheel - Google Sheets Data</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,28 +12,30 @@
       padding: 20px;
       background-color: #f0f0f0;
     }
+
     .wheel-container {
-      width: 300px;
-      height: 300px;
-      margin: 0 auto;
+      width: 400px;
+      height: 400px;
+      margin: 50px auto;
       border-radius: 50%;
       border: 5px solid #333;
       position: relative;
       background-color: #fff;
       overflow: hidden;
     }
+
     .wheel-item {
       position: absolute;
-      width: 50%;
+      width: 100%;
       height: 50%;
-      background-color: #ffcc00;
-      color: white;
-      font-weight: bold;
-      line-height: 50px;
       text-align: center;
-      border-radius: 50%;
-      transform-origin: 100% 100%;
+      line-height: 90px;
+      font-weight: bold;
+      color: white;
+      transform-origin: 50% 100%;
+      font-size: 18px;
     }
+
     #start-button {
       padding: 15px 30px;
       font-size: 16px;
@@ -44,9 +46,11 @@
       cursor: pointer;
       margin-top: 20px;
     }
+
     #start-button:hover {
       background-color: #45a049;
     }
+
     #popup {
       display: none;
       position: fixed;
@@ -59,9 +63,11 @@
       border-radius: 5px;
       box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
     }
+
     #popup h2 {
       margin: 0;
     }
+
     #popup button {
       margin-top: 10px;
       padding: 10px 20px;
@@ -71,17 +77,19 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
     #popup button:hover {
       background-color: #d32f2f;
     }
+
   </style>
 </head>
 <body>
 
-  <h1>Spin Wheel from Google Sheets - Column B</h1>
+  <h1>Wheel Spin from Google Sheets - Column B</h1>
   
   <div class="wheel-container" id="wheel-container">
-    <!-- Các mục của vòng quay sẽ được thêm vào đây -->
+    <!-- Các mục sẽ được thêm vào đây -->
   </div>
   
   <button id="start-button">Start Spin</button>
