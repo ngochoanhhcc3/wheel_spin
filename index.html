@@ -6,11 +6,8 @@
   <title>Get Data from Google Sheets</title>
 </head>
 <body>
-
-  <h1>Data from Google Sheets - Column B</h1>
   <table id="data-table" border="1">
     <tr>
-      <th>Column B</th> <!-- Chỉ hiển thị cột B -->
     </tr>
   </table>
 
@@ -33,14 +30,16 @@
         rows.forEach((row, index) => {
           if (index === 0) return; // Bỏ qua hàng đầu tiên nếu là tiêu đề
 
-          const tr = document.createElement('tr');
+          const columnBValue = row[1]; // Chỉ lấy giá trị ở cột B (index 1)
 
-          // Chỉ lấy dữ liệu ở cột B (index 1)
-          const td = document.createElement('td');
-          td.textContent = row[1] || ''; // row[1] là cột B (bắt đầu từ index 0)
-          tr.appendChild(td);
-
-          table.appendChild(tr);
+          // Kiểm tra nếu ô trong cột B có giá trị (không phải chuỗi rỗng hoặc null)
+          if (columnBValue && columnBValue.trim() !== '') {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.textContent = columnBValue; // Gán giá trị cột B vào ô bảng
+            tr.appendChild(td);
+            table.appendChild(tr);
+          }
         });
       })
       .catch(error => console.error('Error fetching data: ', error));
