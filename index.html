@@ -59,6 +59,42 @@
       font-size: 18px;
     }
 
+    /* Spinner container */
+    #spinner-container {
+      margin-top: 50px;
+      position: relative;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 5px solid #4CAF50;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    #spinner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transform-origin: center;
+      transition: transform 3s ease-out;
+    }
+
+    .spinner-item {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: center;
+      transform: translate(-50%, -50%);
+      font-size: 20px;
+      font-weight: bold;
+    }
+
     /* Popup */
     #popup {
       display: none;
@@ -108,6 +144,12 @@
   
   <button id="start-button">Spin</button>
 
+  <div id="spinner-container">
+    <div id="spinner">
+      <!-- Các mục sẽ được thêm vào đây -->
+    </div>
+  </div>
+
   <div id="popup">
     <h2 id="popup-result">Result: </h2>
     <button id="close-popup-button">Close</button>
@@ -139,7 +181,8 @@
             return;
           }
 
-          // Thêm dữ liệu vào bảng
+          // Thêm dữ liệu vào bảng và spinner
+          const spinnerElement = document.getElementById('spinner');
           values.forEach((value, index) => {
             const row = document.createElement('tr');
             const cell1 = document.createElement('td');
@@ -152,6 +195,14 @@
             row.appendChild(cell1);
             row.appendChild(cell2);
             tableBody.appendChild(row);
+
+            // Tạo các mục trên spinner
+            const spinnerItem = document.createElement('div');
+            spinnerItem.classList.add('spinner-item');
+            spinnerItem.textContent = index + 1;
+            const angle = (360 / values.length) * index;
+            spinnerItem.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+            spinnerElement.appendChild(spinnerItem);
           });
 
           // Cài đặt nút quay số
@@ -163,19 +214,26 @@
             if (spinning) return; // Tránh quay khi đang quay
 
             spinning = true;
-            
-            // Chọn ngẫu nhiên một dòng từ bảng
-            const randomIndex = Math.floor(Math.random() * values.length);
-            const result = values[randomIndex];
-            
-            // Hiển thị kết quả trong popup
-            showPopup(result);
 
-            // Xóa lựa chọn đã quay
-            values.splice(randomIndex, 1);
-            updateTable();
+            // Lấy số lượng các mục trong spinner
+            const numItems = values.length;
 
-            spinning = false;
+            // Quay con quay (spin animation)
+            const randomAngle = Math.floor(Math.random() * 360) + (360 * 3); // Quay ít nhất 3 vòng
+
+            // Thực hiện quay
+            const spinner = document.getElementById('spinner');
+            spinner.style.transform = `rotate(${randomAngle}deg)`;
+
+            // Sau khi quay xong, chọn một mục ngẫu nhiên
+            setTimeout(() => {
+              const resultIndex = Math.floor((randomAngle % 360) / (360 / numItems)); // Tính chỉ số mục
+              const result = values[resultIndex];
+
+              // Hiển thị kết quả trong popup
+              showPopup(result);
+            }, 3000); // Thời gian quay: 3 giây
+
           }
 
           // Hiển thị kết quả trong popup
@@ -192,27 +250,6 @@
             document.getElementById('popup').style.display = 'none';
             // Kích hoạt lại nút "Spin"
             document.getElementById('start-button').disabled = false;
-          }
-
-          // Cập nhật bảng sau khi xóa mục
-          function updateTable() {
-            const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = ''; // Xóa bảng hiện tại
-
-            // Thêm lại các mục còn lại trong bảng và đánh lại số thứ tự
-            values.forEach((value, index) => {
-              const row = document.createElement('tr');
-              const cell1 = document.createElement('td');
-              const cell2 = document.createElement('td');
-
-              // Thêm số thứ tự (STT)
-              cell1.textContent = index + 1;
-              cell2.textContent = value;
-
-              row.appendChild(cell1);
-              row.appendChild(cell2);
-              tableBody.appendChild(row);
-            });
           }
 
         })
