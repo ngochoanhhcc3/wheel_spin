@@ -97,6 +97,8 @@
   <table id="data-table">
     <thead>
       <tr>
+        <th>STT</th>
+        <th>Data</th>
       </tr>
     </thead>
     <tbody>
@@ -138,11 +140,17 @@
           }
 
           // Thêm dữ liệu vào bảng
-          values.forEach(value => {
+          values.forEach((value, index) => {
             const row = document.createElement('tr');
-            const cell = document.createElement('td');
-            cell.textContent = value;
-            row.appendChild(cell);
+            const cell1 = document.createElement('td');
+            const cell2 = document.createElement('td');
+
+            // Thêm số thứ tự (STT)
+            cell1.textContent = index + 1;
+            cell2.textContent = value;
+
+            row.appendChild(cell1);
+            row.appendChild(cell2);
             tableBody.appendChild(row);
           });
 
@@ -191,12 +199,18 @@
             const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = ''; // Xóa bảng hiện tại
 
-            // Thêm lại các mục còn lại trong bảng
-            values.forEach(value => {
+            // Thêm lại các mục còn lại trong bảng và đánh lại số thứ tự
+            values.forEach((value, index) => {
               const row = document.createElement('tr');
-              const cell = document.createElement('td');
-              cell.textContent = value;
-              row.appendChild(cell);
+              const cell1 = document.createElement('td');
+              const cell2 = document.createElement('td');
+
+              // Thêm số thứ tự (STT)
+              cell1.textContent = index + 1;
+              cell2.textContent = value;
+
+              row.appendChild(cell1);
+              row.appendChild(cell2);
               tableBody.appendChild(row);
             });
           }
