@@ -60,42 +60,6 @@
     }
 
     /* Spinner container */
-    #spinner-container {
-      margin-top: 50px;
-      position: relative;
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      border: 5px solid #4CAF50;
-      overflow: hidden;
-      margin: 0 auto;
-    }
-
-    #spinner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      transform-origin: center;
-      transition: transform 3s ease-out;
-    }
-
-    .spinner-item {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform-origin: center;
-      transform: translate(-50%, -50%);
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    /* Popup */
     #popup {
       display: none;
       position: fixed;
@@ -107,6 +71,7 @@
       border: 1px solid #333;
       border-radius: 5px;
       box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+      width: 350px;
     }
 
     #popup h2 {
@@ -127,9 +92,46 @@
       background-color: #d32f2f;
     }
 
+    /* Spinner circle */
+    #spinner-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 5px solid #4CAF50;
+      overflow: hidden;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #spinner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-origin: center;
+      transition: transform 3s ease-out;
+    }
+
+    .spinner-item {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      line-height: 50px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 5px;
+      transform-origin: 100% 100%;
+    }
+
   </style>
 </head>
 <body>
+
   <table id="data-table">
     <thead>
       <tr>
@@ -138,117 +140,100 @@
       </tr>
     </thead>
     <tbody>
-      <!-- Dữ liệu sẽ được thêm vào đây -->
+      <!-- Data will be added here -->
     </tbody>
   </table>
   
   <button id="start-button">Spin</button>
 
-  <div id="spinner-container">
-    <div id="spinner">
-      <!-- Các mục sẽ được thêm vào đây -->
-    </div>
-  </div>
-
+  <!-- Popup Spinner -->
   <div id="popup">
-    <h2 id="popup-result">Result: </h2>
-    <button id="close-popup-button">Close</button>
+    <h2>Spin the Wheel</h2>
+    <div id="spinner-container">
+      <div id="spinner">
+        <!-- Spinner items will be added here -->
+      </div>
+    </div>
+    <button onclick="closePopup()">Close</button>
   </div>
 
   <script>
-    // Đảm bảo rằng tất cả mã JavaScript đều được thực thi sau khi DOM đã sẵn sàng
     document.addEventListener("DOMContentLoaded", function () {
-      const sheetID = '1a0d6__ySC3ng8yBiKUon7LxNnnoDnAw2W6-9FXIgFPM'; // ID của Google Sheet
-      const apiKey = 'AIzaSyCVEhUO5xJCdzWHC4wia3Ouk9wNqqMKEaM'; // API Key của bạn
-      const range = 'Ăn'; // Tên sheet trong Google Sheets (bạn có thể thay đổi nếu cần)
+      const sheetID = '1a0d6__ySC3ng8yBiKUon7LxNnnoDnAw2W6-9FXIgFPM'; // Google Sheet ID
+      const apiKey = 'AIzaSyCVEhUO5xJCdzWHC4wia3Ouk9wNqqMKEaM'; // Your API Key
+      const range = 'Ăn'; // Sheet name in Google Sheets
 
-      // URL để lấy dữ liệu từ Google Sheets
       const apiURL = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
 
-      // Lấy dữ liệu từ Google Sheets API
       fetch(apiURL)
         .then(response => response.json())
         .then(data => {
           const rows = data.values;
           const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+          const spinnerElement = document.getElementById('spinner');
 
-          // Dữ liệu từ cột B (row[1]) sẽ được thêm vào bảng
           const values = rows.filter((row, index) => index > 0 && row[1] && row[1].trim() !== '').map(row => row[1]);
 
-          // Xử lý nếu không có dữ liệu
           if (values.length === 0) {
             alert('No valid data in Column B.');
             return;
           }
 
-          // Thêm dữ liệu vào bảng và spinner
-          const spinnerElement = document.getElementById('spinner');
+          // Add data to table
           values.forEach((value, index) => {
             const row = document.createElement('tr');
             const cell1 = document.createElement('td');
             const cell2 = document.createElement('td');
-
-            // Thêm số thứ tự (STT)
             cell1.textContent = index + 1;
             cell2.textContent = value;
-
             row.appendChild(cell1);
             row.appendChild(cell2);
             tableBody.appendChild(row);
 
-            // Tạo các mục trên spinner
+            // Create spinner sections
             const spinnerItem = document.createElement('div');
             spinnerItem.classList.add('spinner-item');
             spinnerItem.textContent = index + 1;
+
             const angle = (360 / values.length) * index;
             spinnerItem.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
             spinnerElement.appendChild(spinnerItem);
           });
 
-          // Cài đặt nút quay số
+          // Add click listener for the "Spin" button
           document.getElementById('start-button').addEventListener('click', startSpin);
 
           let spinning = false;
 
           function startSpin() {
-            if (spinning) return; // Tránh quay khi đang quay
+            if (spinning) return; // Prevent multiple spins
 
             spinning = true;
 
-            // Lấy số lượng các mục trong spinner
             const numItems = values.length;
+            const randomAngle = Math.floor(Math.random() * 360) + (360 * 3); // Spin at least 3 full rotations
 
-            // Quay con quay (spin animation)
-            const randomAngle = Math.floor(Math.random() * 360) + (360 * 3); // Quay ít nhất 3 vòng
-
-            // Thực hiện quay
+            // Apply spinning animation
             const spinner = document.getElementById('spinner');
             spinner.style.transform = `rotate(${randomAngle}deg)`;
 
-            // Sau khi quay xong, chọn một mục ngẫu nhiên
             setTimeout(() => {
-              const resultIndex = Math.floor((randomAngle % 360) / (360 / numItems)); // Tính chỉ số mục
+              const resultIndex = Math.floor((randomAngle % 360) / (360 / numItems)); // Calculate the selected index
               const result = values[resultIndex];
-
-              // Hiển thị kết quả trong popup
               showPopup(result);
-            }, 3000); // Thời gian quay: 3 giây
-
+            }, 3000); // Wait for 3 seconds before showing the result
           }
 
-          // Hiển thị kết quả trong popup
+          // Show result in the popup
           function showPopup(result) {
-            document.getElementById('popup-result').textContent = `Result: ${result}`;
             document.getElementById('popup').style.display = 'block';
+            document.getElementById('popup').querySelector('h2').textContent = `Result: ${result}`;
             document.getElementById('start-button').disabled = true; // Disable button when the popup is shown
           }
 
-          // Đóng popup và cho phép quay lại
-          document.getElementById('close-popup-button').addEventListener('click', closePopup);
-
+          // Close popup and enable the spin button
           function closePopup() {
             document.getElementById('popup').style.display = 'none';
-            // Kích hoạt lại nút "Spin"
             document.getElementById('start-button').disabled = false;
           }
 
